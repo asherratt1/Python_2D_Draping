@@ -25,24 +25,24 @@ if domain_type == 'square':
     thickness_direction = [0., 0., 1.]
 
 # Read in mesh details
-internal_mesh = 'hatChannel_input/cellCenters.csv'
-upper_mesh = 'hatChannel_input/upperSurfaceNormals.csv'
-lower_mesh = 'hatChannel_input/lowerSurfaceNormals.csv'
+internal_mesh = 'input_files/internalMesh.csv'
+upper_mesh = 'input_files/upperMesh.csv'
+lower_mesh = 'input_files/lowerMesh.csv'
 
 # Template file
 template_drape = 'template_files/drapeDirectionTemplate'
 template_thickness = 'template_files/thicknessDirectionTemplate'
 
 # Output location:
-write_file_drape = 'hatChannel_output/drapeDirection'
-write_file_thickness = 'hatChannel_output/thicknessDir'
+write_file_drape = 'output_files/drapeDirection'
+write_file_thickness = 'output_files/thicknessDir'
 
 # Boundary Conditions
 boundaries = ['uppermold', 'lowermold', 'wall']
 conditions = ['zeroGradient','zeroGradient','zeroGradient']
 
 # if 2D geometry
-outline_2D = 'hatChannel_input/hatChannel_2D_profile.csv'
+outline_2D = 'input_files/DrapeXYUpper.csv'
 
 # Execute draping code
 if domain_type == 'square':
