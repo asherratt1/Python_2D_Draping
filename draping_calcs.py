@@ -23,21 +23,21 @@ def write_OF_file(drape_dir, template, file, boundaries, condition):
     drape_string = drape_dir.astype(str)
     drape_str = p.DataFrame(drape_string,dtype = "string")
 
-        # Copy template over to new file
+    # Copy template over to new file
     with open(template) as f:
         lines = f.readlines()
         with open(file,"w") as f1:
             f1.writelines(lines)
 
-        # Write OpenFOAM file and drape data:
+    # Write OpenFOAM file and drape data:
     with open(file,"a") as f1:
-        #f1.writelines(str(inputs))
+        
         f1.write('\n')
         f1.write('(\n')
         for i in range(len(drape_dir)):
             f1.write('(' + drape_str[0][i] + ' ' + drape_str[1][i] + ' ' + drape_str[2][i] + ')\n')
         
-        # Write boundary conditions:
+    # Write boundary conditions:
     with open(file,"a") as f2:
         f2.write(');\n')
         f2.write('boundaryField\n')
@@ -70,16 +70,16 @@ def calc_layer_thickness(domain_thickness, drape_sequence):
 
 def calc_thickness_2D(cc_file, um_file, lm_file, outline):
         
-        # Read file data
-    cell_centers = data_import.read_cell_centers_3D(cc_file)
-    upper_centers, upper_normal = data_import.read_normal_vectors(um_file)
-    lower_centers, lower_normal = data_import.read_normal_vectors(lm_file)
+    # Read file data
+    cell_centers = read_cell_centers_3D(cc_file)
+    upper_centers, upper_normal = read_normal_vectors(um_file)
+    lower_centers, lower_normal = read_normal_vectors(lm_file)
         
     thickness_direction = np.zeros((len(cell_centers), 3))
         
     for num, cells in enumerate(cell_centers, start = 0):
-        min_dist_upper, index_upper = data_manipulation.min_dist(upper_centers, cells)
-        min_dist_lower, index_lower = data_manipulation.min_dist(lower_centers, cells)
+        min_dist_upper, index_upper = min_dist(upper_centers, cells)
+        min_dist_lower, index_lower = min_dist(lower_centers, cells)
             
         # Calculate weighting factor for distance:
         dist_total = min_dist_upper + min_dist_lower
@@ -100,11 +100,11 @@ def calc_thickness_2D(cc_file, um_file, lm_file, outline):
 def calc_normal_distance_square(cc_file, um_file, domain_thickness, drape_sequence):
 
     # Read file data
-    cell_centers = data_import.read_cell_centers_3D(cc_file)
+    cell_centers = read_cell_centers_3D(cc_file)
 
-    upper_centers, upper_normal = data_import.read_normal_vectors(um_file)
+    upper_centers, upper_normal = read_normal_vectors(um_file)
         
-    layer_thickness = data_manipulation.calc_layer_thickness(domain_thickness, drape_sequence)
+    layer_thickness = calc_layer_thickness(domain_thickness, drape_sequence)
         
     layer_devisions = np.linspace(1, len(drape_sequence), len(drape_sequence)) * layer_thickness
         
@@ -115,7 +115,6 @@ def calc_normal_distance_square(cc_file, um_file, domain_thickness, drape_sequen
     for num, cells in enumerate(cell_centers, start = 0):
         #vec_min_dist = domain_thickness - cells[2]
         vec_min_dist = cells[2]
-        #print(vec_min_dist)
         min_distance[num] = vec_min_dist
             
         #for index, layers in enumerate(layer_devisions):
@@ -131,11 +130,11 @@ def calc_normal_distance_square(cc_file, um_file, domain_thickness, drape_sequen
 def calc_normal_distance_2D(cc_file, um_file, outline_2D, domain_thickness, drape_sequence):
         
     # Read file data
-    cell_centers = data_import.read_cell_centers_3D(cc_file)
-    upper_centers, upper_normal = data_import.read_normal_vectors(um_file)
-    #upper2D = data_import.read_cell_centers_2D(outline_2D)
+    cell_centers = read_cell_centers_3D(cc_file)
+    upper_centers, upper_normal = read_normal_vectors(um_file)
+    upper2D = read_cell_centers_2D(outline_2D)
         
-    layer_thickness = data_manipulation.calc_layer_thickness(domain_thickness, drape_sequence)
+    layer_thickness = calc_layer_thickness(domain_thickness, drape_sequence)
         
     layer_devisions = np.linspace(1, len(drape_sequence), len(drape_sequence)) * layer_thickness
         
@@ -143,7 +142,7 @@ def calc_normal_distance_2D(cc_file, um_file, outline_2D, domain_thickness, drap
     layer_location = np.zeros((len(cell_centers), 1))
         
     for num, cells in enumerate(cell_centers, start = 0):
-        point_index = data_manipulation.vec_min_index(upper2D, cell_centers[[num],:][:,[0,1]])
+        point_index = vec_min_index(upper2D, cell_centers[[num],:][:,[0,1]])
             
         xy_point1 = upper2D[point_index[0]]
         xy_point2 = upper2D[point_index[1]]
